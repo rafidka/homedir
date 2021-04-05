@@ -1,2 +1,3 @@
-# emacs
-My personal Emacs configuration
+# homedir
+
+My personal home directory for Linux and macOS.
