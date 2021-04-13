@@ -134,6 +134,11 @@ Plug 'vim-airline/vim-airline-themes'
 
 Plug 'tpope/vim-capslock'
 
+Plug 'tpope/vim-git'
+Plug 'tpope/vim-commentary'
+Plug 'tpope/vim-sleuth'
+Plug 'tpope/vim-fugitive'
+
 " coc plugin
 " https://github.com/neoclide/coc.nvim
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
