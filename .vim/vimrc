@@ -74,6 +74,9 @@ set suffixes=.bak,~,.swp,.o,.info,.aux,.log,.dvi,.bbl,.blg,.brf,.cb,.ind,.idx,.i
 " 50 lines of registers
 set viminfo='20,\"50
 
+" Change the leader to <SPACE>
+:let mapleader = " "
+
 " Different cursor shape for different modes
 let &t_SI = "\<Esc>]50;CursorShape=1\x7"
 let &t_SR = "\<Esc>]50;CursorShape=2\x7"
@@ -114,6 +117,8 @@ Plug 'preservim/nerdtree'
 Plug 'Xuyuanp/nerdtree-git-plugin'
 Plug 'ryanoasis/vim-devicons'
 Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
+let g:NERDTreeWinSize = 40
+let g:NERDTreeIgnore = ['^build$']
 
 " vim-fugitive
 Plug 'tpope/vim-fugitive'
@@ -145,6 +150,8 @@ let g:autopep8_indent_size = 4
 let g:autopep8_on_save = 0
 let g:autopep8_disable_show_diff = 1
 
+Plug 'fatih/vim-go'
+
 " Initialize plugin system
 call plug#end()
 
@@ -164,21 +171,28 @@ let g:airline#extensions#tabline#left_alt_sep = '|'
 let g:airline_statusline_ontop = 1              " status line on top, making room for other plugins to use the status line.
 let g:airline_powerline_fonts = 1               " integrate with powerline fonts - require installation of a patched powerline font.
 
-" fzf config
-" C-P to open fzf
-nnoremap <silent> <c-p> :Files<CR>
-" F2 to open buffers
-nnoremap <silent> <F2> :Buffers<CR>
-" F3 to search file contents
-nnoremap <silent> <F3> :Ag<CR>
-" F4 to search in the lines of the current buffer
-nnoremap <silent> <F4> :BLines<CR>
+" fzf key maps
+" Search file by name
+nnoremap <silent> <Leader>ff :Files<CR>
+" Search open buffers
+nnoremap <silent> <Leader>fb :Buffers<CR>
+" Search file content
+nnoremap <silent> <Leader>fc :Ag<CR>
+" Search lines of current buffer
+nnoremap <silent> <Leader>fl :BLines<CR>
+" Search tags
+nnoremap <silent> <Leader>ft :Tags<CR>
 
-" NERDTree config: F11 to toggle the tree. Also, close vim if the only window left is NERDTreeClose vim if the only window left is NERDTree
+" NERDTree key maps
 nnoremap <silent> <Leader>nt :NERDTreeToggle<CR>
 nnoremap <silent> <Leader>nr :NERDTreeFind<CR>
 
+" Autopep8 key map
 nnoremap <silent> <Leader>ap :Autopep8<CR>
+
+" NERDTree key maps
+nnoremap <silent> <Leader><Leader>n :cnext<CR>
+nnoremap <silent> <Leader><Leader>h :cprev<CR>
 
 " Start NERDTree when Vim starts with a directory argument.
 autocmd StdinReadPre * let s:std_in=1
