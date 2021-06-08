@@ -176,6 +176,9 @@ let g:airline#extensions#tabline#left_alt_sep = '|'
 let g:airline_statusline_ontop = 1              " status line on top, making room for other plugins to use the status line.
 let g:airline_powerline_fonts = 1               " integrate with powerline fonts - require installation of a patched powerline font.
 
+" Use // to search for the selected text.
+vnoremap // y/\V<C-R>=escape(@",'/\')<CR><CR>
+
 " fzf key maps
 " Search file by name
 nnoremap <silent> <Leader>ff :Files<CR>
