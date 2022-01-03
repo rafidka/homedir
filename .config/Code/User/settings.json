@@ -1,0 +1,51 @@
+{
+  "workbench.iconTheme": "vscode-icons",
+  "window.titleBarStyle": "custom",
+  "workbench.editor.enablePreview": false,
+  "workbench.editor.enablePreviewFromQuickOpen": false,
+  "editor.fontFamily": "'Cascadia Code PL', 'Droid Sans Mono', 'monospace', monospace, 'Droid Sans Fallback'",
+  "editor.fontLigatures": true,
+  "editor.formatOnType": true,
+  "editor.lineNumbers": "relative",
+  "explorer.openEditors.visible": 0,
+  "vim.hlsearch": true,
+  "vim.easymotion": true,
+  "vim.handleKeys": {
+    "<C-a>": false,
+    "<C-f>": false,
+    "<C-x>": false,
+    "<C-n>": false
+    // "<C-v>": false,
+  },
+  "vim.history": 200,
+  "terminal.integrated.inheritEnv": false,
+  "files.autoSave": "onWindowChange",
+  "editor.formatOnSave": true,
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "jupyter.alwaysTrustNotebooks": true,
+  "editor.suggestSelection": "first",
+  "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
+  "python.languageServer": "Pylance",
+  "telemetry.enableCrashReporter": false,
+  "telemetry.enableTelemetry": false,
+  "jupyter.askForKernelRestart": false,
+  "explorer.confirmDragAndDrop": false,
+  "terminal.integrated.env.windows": {},
+  "jupyter.textOutputLimit": 0,
+  "workbench.editorAssociations": {
+    "*.ipynb": "jupyter-notebook"
+  },
+  "notebook.cellToolbarLocation": {
+    "default": "right",
+    "jupyter-notebook": "left"
+  },
+  "files.exclude": {
+    "**/.classpath": true,
+    "**/.project": true,
+    "**/.settings": true,
+    "**/.factorypath": true
+  },
+  "editor.inlineSuggest.enabled": true
+}
