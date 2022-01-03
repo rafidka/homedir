@@ -24,16 +24,13 @@
   "[jsonc]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "jupyter.alwaysTrustNotebooks": true,
   "editor.suggestSelection": "first",
-  "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
   "python.languageServer": "Pylance",
-  "telemetry.enableCrashReporter": false,
-  "telemetry.enableTelemetry": false,
+  "telemetry.telemetryLevel": "off",
   "jupyter.askForKernelRestart": false,
   "explorer.confirmDragAndDrop": false,
   "terminal.integrated.env.windows": {},
-  "jupyter.textOutputLimit": 0,
+  "notebook.output.textLineLimit": 0,
   "workbench.editorAssociations": {
     "*.ipynb": "jupyter-notebook"
   },
