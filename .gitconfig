@@ -1,0 +1,11 @@
+[pull]
+	ff = only
+[init]
+	defaultBranch = master
+[user]
+	email = rafidka@gmail.com
+	name = Rafid Al-Humaimidi
+[alias]
+	st = status
+[core]
+	editor = vim
