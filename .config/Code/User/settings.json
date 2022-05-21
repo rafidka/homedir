@@ -30,7 +30,7 @@
   "jupyter.askForKernelRestart": false,
   "explorer.confirmDragAndDrop": false,
   "terminal.integrated.env.windows": {},
-  "notebook.output.textLineLimit": 0,
+  "notebook.output.textLineLimit": 30,
   "workbench.editorAssociations": {
     "*.ipynb": "jupyter-notebook"
   },
@@ -44,5 +44,11 @@
     "**/.settings": true,
     "**/.factorypath": true
   },
-  "editor.inlineSuggest.enabled": true
+  "editor.inlineSuggest.enabled": true,
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
 }
