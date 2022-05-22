@@ -21,6 +21,9 @@
   "terminal.integrated.inheritEnv": false,
   "files.autoSave": "onWindowChange",
   "editor.formatOnSave": true,
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
   "[jsonc]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
@@ -46,9 +49,13 @@
   },
   "editor.inlineSuggest.enabled": true,
   "[javascript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.rulers": [80],
+    "editor.wordWrapColumn": 80
   },
   "[typescript]": {
+    "editor.rulers": [80],
+    "editor.wordWrapColumn": 80,
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   }
 }
