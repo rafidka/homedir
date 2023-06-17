@@ -155,7 +155,9 @@ let g:autopep8_indent_size = 4
 let g:autopep8_on_save = 0
 let g:autopep8_disable_show_diff = 1
 
-Plug 'fatih/vim-go'
+" Removing vim-go for now as it causes issues with vim (even not allowing you to
+" save files) if there are no Go binaries.
+" Plug 'fatih/vim-go'
 
 " Initialize plugin system
 call plug#end()
