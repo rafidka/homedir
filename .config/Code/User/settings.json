@@ -13,13 +13,7 @@
   "explorer.openEditors.visible": 0,
   // Files settings
   "files.autoSave": "onWindowChange",
-  "files.exclude": {
-    "**/.classpath": true,
-    "**/.factorypath": true,
-    "**/.project": true,
-    "**/.settings": true
-  },
-  // Jupyter settings
+  // Python/Jupyter settings
   "jupyter.askForKernelRestart": false,
   "notebook.cellToolbarLocation": {
     "default": "right",
@@ -36,15 +30,21 @@
   "vim.handleKeys": {
     "<C-a>": false,
     "<C-f>": false,
-    "<C-x>": false,
-    "<C-n>": false
+    "<C-n>": false,
+    "<C-p>": false,
+    "<C-q>": false,
+    "<C-x>": false
   },
   "vim.history": 1000,
   "vim.hlsearch": true,
+  "vim.textwidth": 88,
+  // Window settings
   "window.titleBarStyle": "custom",
   "workbench.editor.enablePreview": false,
   "workbench.editor.enablePreviewFromQuickOpen": false,
-  "workbench.editorAssociations": { "*.ipynb": "jupyter-notebook" },
+  "workbench.editorAssociations": {
+    "*.ipynb": "jupyter-notebook"
+  },
   "workbench.iconTheme": "vscode-icons",
   // Language-specific settings.
   "[java]": {
@@ -53,30 +53,80 @@
     "editor.formatOnSave": true,
     "editor.indentSize": 4,
     "editor.insertSpaces": true,
-    "editor.rulers": [120],
+    "editor.rulers": [
+      120
+    ],
     "editor.tabSize": 4,
     "editor.wordWrapColumn": 120,
     "vim.textwidth": 120
   },
   "[javascript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.rulers": [80],
+    "editor.rulers": [
+      80
+    ],
     "editor.wordWrapColumn": 80
   },
   "[json]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "[jsonc]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defag=multFormatter": "esbenp.prettier-vscode",
+    "editor.defaultFormatter": "vscode.json-language-features"
   },
   "[python]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.rulers": [80],
-    "editor.wordWrapColumn": 80
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.rulers": [
+      88
+    ],
+    "editor.wordWrapColumn": 88
   },
   "[typescript]": {
-    "editor.rulers": [80],
-    "editor.wordWrapColumn": 80,
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  }
+    "editor.rulers": [
+      120
+    ],
+    "editor.wordWrapColumn": 120,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "vim.textwidth": 120
+  },
+  "workbench.startupEditor": "none",
+  "git.openRepositoryInParentFolders": "never",
+  "search.exclude": {
+    "env": true,
+    "src/*/build": true,
+    "build": true,
+    "**/node_modules": true,
+    "**/bower_components": true,
+    "**/*.code-search": true
+  },
+  "cSpell.userWords": [
+    "autoscale",
+    "boto",
+    "botocore",
+    "cloudwatchlogs",
+    "dateutil",
+    "dgram",
+    "fargate",
+    "getfl",
+    "gethostname",
+    "getpgid",
+    "getpid",
+    "healthcheck",
+    "healthchecks",
+    "hostnames",
+    "killpg",
+    "mwaa",
+    "nonblock",
+    "plog",
+    "poolclass",
+    "procs",
+    "psutil",
+    "setfl",
+    "sqlalchemy",
+    "sqlconn",
+    "triggerer",
+    "tzutc",
+    "uaxw",
+    "webserver"
+  ]
 }
