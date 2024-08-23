@@ -30,6 +30,7 @@
   "vim.handleKeys": {
     "<C-a>": false,
     "<C-f>": false,
+    "<C-i>": false,
     "<C-n>": false,
     "<C-p>": false,
     "<C-q>": false,
@@ -63,9 +64,9 @@
   "[javascript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.rulers": [
-      80
+      120
     ],
-    "editor.wordWrapColumn": 80
+    "editor.wordWrapColumn": 120
   },
   "[json]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
@@ -87,7 +88,24 @@
     ],
     "editor.wordWrapColumn": 120,
     "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "prettier.printWidth": 120,
     "vim.textwidth": 120
+  },
+  "[shellscript]": {
+    "editor.rulers": [
+      100
+    ],
+    "editor.wordWrapColumn": 100,
+    "prettier.printWidth": 100,
+    "vim.textwidth": 100
+  },
+  "[dockerfile]": {
+    "editor.rulers": [
+      100
+    ],
+    "editor.wordWrapColumn": 100,
+    "prettier.printWidth": 100,
+    "vim.textwidth": 100
   },
   "workbench.startupEditor": "none",
   "git.openRepositoryInParentFolders": "never",
