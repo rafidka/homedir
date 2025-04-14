@@ -5,7 +5,6 @@ if [[ "`uname`" == "Darwin" ]]; then
 else
   alias ls='ls -F --color'
 fi
-alias l='ls -lh'
 
 # Change to temp/ directory; create it if it is not created.
 alias t="mkdir -p ~/temp && cd ~/temp"

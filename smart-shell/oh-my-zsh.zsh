@@ -41,7 +41,7 @@ HYPHEN_INSENSITIVE="true"
 # DISABLE_AUTO_TITLE="true"
 
 # Uncomment the following line to enable command auto-correction.
-ENABLE_CORRECTION="true"
+ENABLE_CORRECTION="false"
 
 # Uncomment the following line to display red dots whilst waiting for completion.
 COMPLETION_WAITING_DOTS="true"
@@ -147,13 +147,13 @@ function ss_prompt_python_env() {
 function ss_prompt_context() {
   if ! [[ -z $SS_ZSH_CUSTOM_PROMPT ]]; then
     local user="$SS_ZSH_CUSTOM_PROMPT"
-    color=red
+    color=green
     prompt_segment $color $PRIMARY_FG " $user "
   else
     local user=`whoami`
 
     if [[ "$user" != "$DEFAULT_USER" || -n "$SSH_CONNECTION" ]]; then
-      color=red
+      color=green
       prompt_segment $color $PRIMARY_FG " %(!.%{%F{yellow}%}.)$user@%m "
     fi
   fi
