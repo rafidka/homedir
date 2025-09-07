@@ -34,6 +34,7 @@
     "<C-n>": false,
     "<C-p>": false,
     "<C-q>": false,
+    "<C-w>": false,
     "<C-x>": false
   },
   "vim.history": 1000,

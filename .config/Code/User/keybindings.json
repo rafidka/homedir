@@ -28,5 +28,10 @@
     "key": "ctrl+alt+f",
     "command": "editor.action.quickFix",
     "when": "editorTextFocus"
+  },
+  {
+    "key": "ctrl+shift+alt+f",
+    "command": "ruff.executeAutofix",
+    "when": "editorTextFocus"
   }
 ]
