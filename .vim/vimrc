@@ -105,16 +105,9 @@ endif
 " vim-code-dark https://github.com/tomasiser/vim-code-dark#installation
 Plug 'tomasiser/vim-code-dark'
 
-" post install (yarn install | npm install) then load plugin only for editing supported files
-Plug 'prettier/vim-prettier', {
-  \ 'do': 'yarn install',
-  \ 'for': ['javascript', 'typescript', 'css', 'less', 'scss', 'json', 'graphql', 'markdown', 'vue', 'yaml', 'html'] }
-
 " fzf is a general-purpose command-line fuzzy finder.
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
-
-"Plug 'itchyny/lightline.vim'
 
 " NERDTree and friends
 " https://github.com/preservim/nerdtree
@@ -125,14 +118,8 @@ Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
 let g:NERDTreeWinSize = 40
 let g:NERDTreeIgnore = ['^build$']
 
-" vim-fugitive
-Plug 'tpope/vim-fugitive'
-
 " editorconfig vim plugin
 Plug 'editorconfig/editorconfig-vim'
-
-" rust.vim
-Plug 'rust-lang/rust.vim'
 
 " python-syntax: Improved synatx highlighting for Python.
 let g:python_highlight_all = 1
@@ -141,10 +128,6 @@ Plug 'vim-python/python-syntax'
 " vim-airline
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
-
-" coc plugin
-" https://github.com/neoclide/coc.nvim
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
 Plug 'kevinoid/vim-jsonc'
 
@@ -225,6 +208,4 @@ nnoremap <silent> ]B :blast<CR>
 if has('mouse_sgr')
     set ttymouse=sgr
 endif
-
-so ~/.vim/coc.vim
 
