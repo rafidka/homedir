@@ -86,35 +86,31 @@ my_procs
 ### 📁 File Operations
 
 #### `gsget`
-Download files from Google Cloud Storage to the current directory.
+Download files from Google Cloud Storage.
 
 ```bash
-gsget gs://bucket/path/to/file.txt
+gsget gs://bucket/path/to/file.txt          # Download to current directory
+gsget gs://bucket/file.txt /tmp/            # Download to specific path
+gsget --help                                # Show usage information
 ```
 
-#### `copy_to_mac`
-Copy files to a Mac machine via Tailscale network.
-
-```bash
-copy_to_mac <file>
-# Example: copy_to_mac report.pdf
-```
-
-- Copies to `~/temp/` on the Mac
-- Requires Tailscale setup and SSH access
+- Validates GCS paths (must start with gs://)
+- Shows download progress and status
+- Requires gsutil to be installed
 
 #### `sweep_sandbox`
-Clean up old files in the sandbox directory (`~/Workspace/sandbox`).
+Clean up old files in the sandbox directory.
 
 ```bash
-# Preview what would be deleted
-sweep_sandbox --dry-run
-
-# Actually delete old files
-sweep_sandbox
+sweep_sandbox                        # Remove files older than 12 hours
+sweep_sandbox --dry-run             # Preview what would be deleted
+sweep_sandbox --age 24               # Use 24 hour threshold
+sweep_sandbox -v -a 1               # Verbose output, 1 hour threshold
+sweep_sandbox --path ~/tmp/sandbox  # Use custom sandbox path
 ```
 
-- Removes files/folders not accessed in the last 12 hours
+- Default: removes files not accessed in 12 hours from `~/Workspace/sandbox`
+- Shows file sizes and last access times with `-v/--verbose`
 - Always use `--dry-run` first to preview changes
 
 ---
@@ -122,18 +118,31 @@ sweep_sandbox
 ### 🔧 Other Utilities
 
 #### `sum`
-Simple calculation utility.
+Sum numeric values from input columns.
 
 ```bash
-sum
+echo -e "10\n20\n30" | sum              # Sum first column (60)
+echo -e "a 10\nb 20\nc 30" | sum 2      # Sum second column (60)
+cat data.txt | sum 3                   # Sum third column from file
 ```
+
+- Reads from stdin and sums specified column (default: column 1)
+- Handles both integers and floating-point numbers
+- Ignores non-numeric values
 
 #### `export_env`
-Environment variable management utility.
+Convert .env files to shell export commands.
 
 ```bash
-export_env
+export_env                           # Read from .env in current directory
+export_env config.env               # Read from specific file
+eval $(export_env .env)            # Apply exports to current shell
+export_env --help                   # Show usage information
 ```
+
+- Handles quoted values and special characters
+- Ignores comments and empty lines
+- Shows warnings for malformed lines
 
 ## Requirements
 
@@ -143,14 +152,37 @@ export_env
 - **gsutil**: For Google Cloud Storage operations
 - **Tailscale**: For cross-machine file copying
 
-## Safety Notes
+## Help and Documentation
 
-⚠️ **Destructive Operations**: 
-- `dclean` and `dclean-all` will remove Docker resources
-- `clean_python_stuff` will delete development artifacts
-- `sweep_sandbox` will delete old files
+All scripts now include comprehensive help:
 
-Always use `--dry-run` flags when available to preview changes before execution.
+```bash
+<script-name> --help    # Show detailed usage information
+```
+
+## Safety Features
+
+### Confirmation Prompts
+Destructive operations now require confirmation:
+- `dclean` - Prompts before removing Docker resources (bypass with `-f`)
+- `dclean-all` - Requires typing "yes" to confirm (bypass with `-f`)
+- `clean_python_stuff` - Shows item count and prompts (bypass with `-f`)
+
+### Dry Run Mode
+Preview changes before execution:
+- `clean_python_stuff --dry-run` - Preview Python cleanup
+- `sweep_sandbox --dry-run` - Preview sandbox cleanup
+
+### Dependency Checking
+Scripts check for required dependencies and provide installation instructions:
+- Docker commands check for Docker installation
+- `gsget` checks for gsutil
+- `my_procs` checks for pstree and provides OS-specific install commands
+
+### OS Compatibility
+- `mem_usage` - Detects Linux/macOS and uses appropriate commands
+- `my_procs` - Provides fallback to `ps` if pstree unavailable
+- `clean_python_stuff` - Uses `find` for POSIX compatibility
 
 ## Contributing
 

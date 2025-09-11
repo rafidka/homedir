@@ -1,61 +1,259 @@
 #!/usr/bin/env python3
+"""
+Clean up old files in the sandbox directory.
+
+Usage:
+    sweep_sandbox [OPTIONS]
+    sweep_sandbox -h|--help
+
+Options:
+    -d, --dry-run       Show what would be deleted without removing
+    -v, --verbose       Show detailed output
+    -a, --age HOURS     Set age threshold in hours (default: 0.5)
+    -p, --path PATH     Set sandbox path (default: ~/Workspace/sandbox)
+    -h, --help          Show this help message
+
+Description:
+    Removes files and directories from the sandbox that haven't been
+    accessed within the specified time threshold. By default, removes
+    items not accessed in the last 12 hours (0.5 days).
+
+Examples:
+    sweep_sandbox                  # Remove old files (12 hour threshold)
+    sweep_sandbox --dry-run        # Preview what would be deleted
+    sweep_sandbox --age 24         # Use 24 hour threshold
+    sweep_sandbox -v -a 1          # Verbose output, 1 hour threshold
+"""
+
 import argparse
 import os
 import shutil
+import sys
 import time
 from pathlib import Path
-
-# Constants
-SANDBOX_DIR = Path.home() / "Workspace" / "sandbox"
-AGE_THRESHOLD_DAYS = 0.5
-AGE_THRESHOLD_SECS = AGE_THRESHOLD_DAYS * 24 * 60 * 60
-NOW = time.time()
+from datetime import datetime, timedelta
 
 
-def is_old_enough(path: Path) -> bool:
-    """Return True if the file/dir has not been accessed in over AGE_THRESHOLD_DAYS."""
+def parse_args():
+    """Parse command line arguments."""
+    parser = argparse.ArgumentParser(
+        description="Clean up old files in the sandbox directory",
+        add_help=False  # We'll handle help ourselves for consistency
+    )
+    
+    parser.add_argument(
+        "-d", "--dry-run",
+        action="store_true",
+        help="Show what would be deleted without removing"
+    )
+    
+    parser.add_argument(
+        "-v", "--verbose",
+        action="store_true",
+        help="Show detailed output"
+    )
+    
+    parser.add_argument(
+        "-a", "--age",
+        type=float,
+        default=0.5,
+        help="Age threshold in days (default: 0.5 = 12 hours)"
+    )
+    
+    parser.add_argument(
+        "-p", "--path",
+        type=str,
+        default=None,
+        help="Sandbox directory path (default: ~/Workspace/sandbox)"
+    )
+    
+    parser.add_argument(
+        "-h", "--help",
+        action="store_true",
+        help="Show help message and exit"
+    )
+    
+    args = parser.parse_args()
+    
+    if args.help:
+        print(__doc__)
+        sys.exit(0)
+    
+    return args
+
+
+def format_time_ago(timestamp):
+    """Format a timestamp as 'X hours/days ago'."""
+    now = time.time()
+    diff = now - timestamp
+    
+    if diff < 3600:  # Less than 1 hour
+        minutes = int(diff / 60)
+        return f"{minutes} minute{'s' if minutes != 1 else ''} ago"
+    elif diff < 86400:  # Less than 1 day
+        hours = int(diff / 3600)
+        return f"{hours} hour{'s' if hours != 1 else ''} ago"
+    else:
+        days = int(diff / 86400)
+        return f"{days} day{'s' if days != 1 else ''} ago"
+
+
+def format_size(size_bytes):
+    """Format file size in human-readable format."""
+    for unit in ['B', 'KB', 'MB', 'GB']:
+        if size_bytes < 1024.0:
+            return f"{size_bytes:.1f} {unit}"
+        size_bytes /= 1024.0
+    return f"{size_bytes:.1f} TB"
+
+
+def get_dir_size(path):
+    """Calculate total size of a directory."""
+    total = 0
+    try:
+        for entry in os.scandir(path):
+            if entry.is_file(follow_symlinks=False):
+                total += entry.stat().st_size
+            elif entry.is_dir(follow_symlinks=False):
+                total += get_dir_size(entry.path)
+    except (OSError, PermissionError):
+        pass
+    return total
+
+
+def is_old_enough(path: Path, threshold_secs: float, verbose: bool = False) -> bool:
+    """Return True if the file/dir has not been accessed within the threshold."""
     try:
         stat = path.stat()
-        return (NOW - stat.st_atime) > AGE_THRESHOLD_SECS
+        age = time.time() - stat.st_atime
+        
+        if verbose:
+            last_access = format_time_ago(stat.st_atime)
+            print(f"  Checking: {path.name} (accessed {last_access})")
+        
+        return age > threshold_secs
     except FileNotFoundError:
         return False  # Maybe deleted during scan
 
 
-def is_folder_unused(folder: Path) -> bool:
+def is_folder_unused(folder: Path, threshold_secs: float, verbose: bool = False) -> bool:
     """Check if the folder and all its contents haven't been accessed recently."""
+    # First check the folder itself
+    if not is_old_enough(folder, threshold_secs, verbose=False):
+        return False
+    
+    # Then check all contents
     for root, dirs, files in os.walk(folder):
         for name in dirs + files:
             item_path = Path(root) / name
-            if not is_old_enough(item_path):
+            if not is_old_enough(item_path, threshold_secs, verbose=False):
+                if verbose:
+                    print(f"  Keeping {folder.name}: {item_path.name} was recently accessed")
                 return False
-    return is_old_enough(folder)
+    
+    return True
 
 
-def delete_unused_items(dry_run: bool = False):
-    if not SANDBOX_DIR.exists():
-        print(f"Directory {SANDBOX_DIR} does not exist.")
-        return
-
-    for item in SANDBOX_DIR.iterdir():
+def delete_unused_items(sandbox_dir: Path, age_threshold_days: float, 
+                       dry_run: bool = False, verbose: bool = False):
+    """Delete or preview deletion of old items in sandbox."""
+    
+    if not sandbox_dir.exists():
+        print(f"Error: Directory {sandbox_dir} does not exist.")
+        sys.exit(1)
+    
+    threshold_secs = age_threshold_days * 24 * 60 * 60
+    threshold_time = datetime.now() - timedelta(days=age_threshold_days)
+    
+    print(f"{'[DRY RUN] ' if dry_run else ''}Scanning: {sandbox_dir}")
+    print(f"Threshold: {age_threshold_days:.1f} days ({age_threshold_days * 24:.1f} hours)")
+    print(f"Items older than: {threshold_time.strftime('%Y-%m-%d %H:%M:%S')}")
+    print()
+    
+    items_deleted = 0
+    space_freed = 0
+    
+    for item in sorted(sandbox_dir.iterdir()):
         try:
             if item.is_dir():
-                if is_folder_unused(item):
-                    print(f"[DELETE DIR] {item}")
+                if is_folder_unused(item, threshold_secs, verbose):
+                    size = get_dir_size(item)
+                    space_freed += size
+                    items_deleted += 1
+                    
+                    stat = item.stat()
+                    last_access = format_time_ago(stat.st_atime)
+                    
+                    if dry_run:
+                        print(f"[WOULD DELETE DIR] {item.name}")
+                    else:
+                        print(f"[DELETE DIR] {item.name}")
+                    
+                    if verbose:
+                        print(f"  Size: {format_size(size)}")
+                        print(f"  Last accessed: {last_access}")
+                    
                     if not dry_run:
                         shutil.rmtree(item)
+                        
             elif item.is_file():
-                if is_old_enough(item):
-                    print(f"[DELETE FILE] {item}")
+                if is_old_enough(item, threshold_secs, verbose):
+                    size = item.stat().st_size
+                    space_freed += size
+                    items_deleted += 1
+                    
+                    stat = item.stat()
+                    last_access = format_time_ago(stat.st_atime)
+                    
+                    if dry_run:
+                        print(f"[WOULD DELETE FILE] {item.name}")
+                    else:
+                        print(f"[DELETE FILE] {item.name}")
+                    
+                    if verbose:
+                        print(f"  Size: {format_size(size)}")
+                        print(f"  Last accessed: {last_access}")
+                    
                     if not dry_run:
                         item.unlink()
+                        
         except Exception as e:
-            print(f"[ERROR] Failed to delete {item}: {e}")
+            print(f"[ERROR] Failed to process {item}: {e}", file=sys.stderr)
+    
+    print()
+    if dry_run:
+        print(f"Dry run complete: Would delete {items_deleted} item(s)")
+        print(f"Space that would be freed: {format_size(space_freed)}")
+    else:
+        if items_deleted > 0:
+            print(f"✓ Deleted {items_deleted} item(s)")
+            print(f"Space freed: {format_size(space_freed)}")
+        else:
+            print("No items to delete - sandbox is clean!")
+
+
+def main():
+    """Main entry point."""
+    args = parse_args()
+    
+    # Determine sandbox directory
+    if args.path:
+        sandbox_dir = Path(args.path).expanduser()
+    else:
+        sandbox_dir = Path.home() / "Workspace" / "sandbox"
+    
+    # Validate age threshold
+    if args.age <= 0:
+        print("Error: Age threshold must be positive", file=sys.stderr)
+        sys.exit(1)
+    
+    delete_unused_items(
+        sandbox_dir=sandbox_dir,
+        age_threshold_days=args.age,
+        dry_run=args.dry_run,
+        verbose=args.verbose
+    )
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Sweep unused files and folders in the sandbox.")
-    parser.add_argument("--dry-run", action="store_true", help="Only show what would be deleted.")
-    args = parser.parse_args()
-
-    delete_unused_items(dry_run=args.dry_run)
-
+    main()

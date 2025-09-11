@@ -2,9 +2,8 @@
 *
 
 # except these...
-!.emacs.d
-!.emacs.d/**/*
 !.gitignore
 !.vim
 !.vim/**/*
+!bin/
 !smart-shell
