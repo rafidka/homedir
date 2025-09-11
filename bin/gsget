@@ -41,13 +41,12 @@ DEST="${2:-.}"
 
 # Validate source starts with gs://
 if [[ ! "$SOURCE" =~ ^gs:// ]]; then
-    echo "Error: Source must be a Google Cloud Storage path (gs://...)" >&2
-    exit 1
+    SOURCE="gs://${SOURCE}"
 fi
 
 # Download the file
-echo "Downloading $SOURCE to $DEST..."
-if gsutil cp "$SOURCE" "$DEST"; then
+echo "Downloading $SOURCE to $DEST"
+if gsutil -m cp -r "$SOURCE" "$DEST"; then
     echo "✓ Download complete."
 else
     echo "✗ Download failed." >&2
