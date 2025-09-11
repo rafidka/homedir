@@ -14,43 +14,43 @@ export PATH="$HOME/bin:$PATH"
 
 ### 🐳 Docker Management
 
-#### `dshell`
+#### `docker-shell`
 SSH into a running Docker container with partial name matching support.
 
 ```bash
-dshell <partial_container_name>
-# Example: dshell web
+docker-shell <partial_container_name>
+# Example: docker-shell web
 ```
 
 - Automatically detects and uses bash if available, falls back to sh
 - Shows list of running containers if no argument provided
 - Supports partial container name/ID matching
 
-#### `dclean`
+#### `docker-clean`
 Stop and remove all Docker containers and images.
 
 ```bash
-dclean
+docker-clean
 ```
 
 ⚠️ **Warning**: This will remove ALL containers and images on your system.
 
-#### `dclean-all`
+#### `docker-purge`
 More aggressive Docker cleanup (removes volumes and networks).
 
 ```bash
-dclean-all
+docker-purge
 ```
 
 ---
 
 ### 🐍 Python Development
 
-#### `clean_python_stuff`
-Recursively clean Python development artifacts from the current directory tree.
+#### `pyclean`
+Recursively clean Python development artifacts from a directory tree.
 
 ```bash
-clean_python_stuff
+pyclean
 ```
 
 Removes:
@@ -58,6 +58,9 @@ Removes:
 - `__pycache__` directories
 - `.pytest_cache/` directories
 - `poetry_install.log` files
+- `*.pyc` files
+- `.coverage` files
+- `*.egg-info` directories
 
 ---
 
@@ -74,11 +77,11 @@ mem_usage /full/path/to/process
 - Reports total memory usage in MB
 - Handles multiple instances of the same process
 
-#### `my_procs`
+#### `proctree`
 Display process tree for the current user.
 
 ```bash
-my_procs
+proctree
 ```
 
 ---
@@ -117,27 +120,27 @@ sweep_sandbox --path ~/tmp/sandbox  # Use custom sandbox path
 
 ### 🔧 Other Utilities
 
-#### `sum`
+#### `sumcol`
 Sum numeric values from input columns.
 
 ```bash
-echo -e "10\n20\n30" | sum              # Sum first column (60)
-echo -e "a 10\nb 20\nc 30" | sum 2      # Sum second column (60)
-cat data.txt | sum 3                   # Sum third column from file
+echo -e "10\n20\n30" | sumcol              # Sum first column (60)
+echo -e "a 10\nb 20\nc 30" | sumcol 2      # Sum second column (60)
+cat data.txt | sumcol 3                   # Sum third column from file
 ```
 
 - Reads from stdin and sums specified column (default: column 1)
 - Handles both integers and floating-point numbers
 - Ignores non-numeric values
 
-#### `export_env`
+#### `dotenv-export`
 Convert .env files to shell export commands.
 
 ```bash
-export_env                           # Read from .env in current directory
-export_env config.env               # Read from specific file
-eval $(export_env .env)            # Apply exports to current shell
-export_env --help                   # Show usage information
+dotenv-export                           # Read from .env in current directory
+dotenv-export config.env               # Read from specific file
+eval $(dotenv-export .env)            # Apply exports to current shell
+dotenv-export --help                   # Show usage information
 ```
 
 - Handles quoted values and special characters
@@ -150,7 +153,6 @@ export_env --help                   # Show usage information
 - **Python**: Version 3.6+
 - **Docker**: For container management scripts
 - **gsutil**: For Google Cloud Storage operations
-- **Tailscale**: For cross-machine file copying
 
 ## Help and Documentation
 
@@ -164,25 +166,25 @@ All scripts now include comprehensive help:
 
 ### Confirmation Prompts
 Destructive operations now require confirmation:
-- `dclean` - Prompts before removing Docker resources (bypass with `-f`)
-- `dclean-all` - Requires typing "yes" to confirm (bypass with `-f`)
-- `clean_python_stuff` - Shows item count and prompts (bypass with `-f`)
+- `docker-clean` - Prompts before removing Docker resources (bypass with `-f`)
+- `docker-purge` - Requires typing "yes" to confirm (bypass with `-f`)
+- `pyclean` - Shows item count and prompts (bypass with `-f`)
 
 ### Dry Run Mode
 Preview changes before execution:
-- `clean_python_stuff --dry-run` - Preview Python cleanup
+- `pyclean --dry-run` - Preview Python cleanup
 - `sweep_sandbox --dry-run` - Preview sandbox cleanup
 
 ### Dependency Checking
 Scripts check for required dependencies and provide installation instructions:
 - Docker commands check for Docker installation
 - `gsget` checks for gsutil
-- `my_procs` checks for pstree and provides OS-specific install commands
+- `proctree` checks for pstree and provides OS-specific install commands
 
 ### OS Compatibility
 - `mem_usage` - Detects Linux/macOS and uses appropriate commands
-- `my_procs` - Provides fallback to `ps` if pstree unavailable
-- `clean_python_stuff` - Uses `find` for POSIX compatibility
+- `proctree` - Provides fallback to `ps` if pstree unavailable
+- `pyclean` - Uses `find` for POSIX compatibility
 
 ## Contributing
 

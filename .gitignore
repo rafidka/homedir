@@ -5,5 +5,8 @@
 !.gitignore
 !.vim
 !.vim/**/*
-!bin/
+!bin
+!bin/**/*
 !smart-shell
+!smart-shell/**/*
+

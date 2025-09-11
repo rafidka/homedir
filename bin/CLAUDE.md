@@ -9,26 +9,36 @@ This is a personal utilities repository (`~/bin`) containing shell scripts and P
 ## Common Development Commands
 
 ### Docker Management
-- `dshell <container_name>` - SSH into a running Docker container (supports partial name matching)
-- `dclean` - Stop and remove all Docker containers and images
-- `dclean-all` - More aggressive Docker cleanup (check script for details)
+- `docker-shell <container>` - Open shell in Docker container (auto-detects bash/sh, supports partial matching)
+- `docker-clean [-f]` - Remove all containers and images (prompts for confirmation)
+- `docker-purge [-f]` - Remove ALL Docker resources including volumes and networks (requires "yes" confirmation)
 
 ### Python Development
-- `clean_python_stuff` - Recursively removes `.venv/`, `__pycache__`, `.pytest_cache/`, and `poetry_install.log` from current directory tree
+- `pyclean [--dry-run] [-f] [-v] [dir]` - Remove Python artifacts (venv, __pycache__, etc.)
+  - Supports dry-run mode, force flag, verbose output, and custom directory
+  - Uses `find` command for cross-platform compatibility
 
 ### Process Management
-- `mem_usage /path/to/process` - Monitor memory usage of a process by its executable path
-- `my_procs` - Display process tree for current user
+- `mem_usage <process>` - Monitor memory usage with OS detection (Linux/macOS)
+  - Shows per-process breakdown for multiple instances
+  - Formats output in MB/GB automatically
+- `proctree [username] [-s|-p|-a]` - Display process tree with dependency checking
+  - Falls back to `ps` if pstree unavailable
+  - Provides OS-specific installation instructions
 
 ### File Operations
-- `gsget <gs://path>` - Download file from Google Cloud Storage to current directory
-- `copy_to_mac <file>` - Copy file to Mac via Tailscale network
-- `sweep_sandbox` - Clean up old files in ~/Workspace/sandbox (files unused for >12 hours)
-  - Use `--dry-run` flag to preview what would be deleted
+- `gsget <gs://path> [dest]` - Download from Google Cloud Storage with validation
+- `sweep_sandbox [-d] [-v] [-a hours] [-p path]` - Clean old sandbox files
+  - Configurable age threshold and path
+  - Verbose mode shows sizes and access times
+  - Dry-run mode for safe preview
 
 ### Utilities
-- `sum` - Calculation utility (check implementation for details)
-- `export_env` - Environment variable management
+- `sumcol [column]` - Sum numeric values from specified column (default: 1)
+  - Reads from stdin, handles floats and integers
+- `dotenv-export [file]` - Convert .env to shell exports
+  - Handles quotes and special characters properly
+  - Shows warnings for malformed lines
 
 ## Architecture Notes
 
@@ -38,13 +48,17 @@ This is a personal utilities repository (`~/bin`) containing shell scripts and P
 - Git completion and prompt helpers included (`git-completion.bash`, `git-prompt.sh`)
 
 ### Key Patterns
-1. **Docker scripts**: Use pattern matching for container names and automatic shell detection (bash vs sh)
-2. **Python scripts**: Use argparse for CLI arguments, subprocess for system commands
-3. **Cleanup scripts**: Implement dry-run functionality for safety
-4. **Network scripts**: Leverage Tailscale for cross-machine operations
+1. **Help system**: All scripts support `-h/--help` with detailed documentation
+2. **Safety features**: Confirmation prompts, dry-run modes, dependency checking
+3. **OS compatibility**: Platform detection, fallback commands, portable implementations
+4. **Error handling**: Validate inputs, check dependencies, provide helpful error messages
+5. **Python scripts**: Type hints, docstrings, proper error handling
+6. **Bash scripts**: Consistent option parsing, proper quoting, error checking
 
-### Development Considerations
-- Scripts assume Linux/macOS environment
-- Python scripts use `#!/usr/bin/env python3` shebang for portability
-- Docker scripts handle edge cases (no containers, multiple matches)
-- File operations use Path objects from pathlib for better cross-platform support
+### Development Standards
+- **Shebangs**: `#!/bin/bash` for shell, `#!/usr/bin/env python3` for Python
+- **Help flags**: All scripts implement `-h/--help` with usage examples
+- **Exit codes**: 0 for success, 1 for general errors, proper error messages to stderr
+- **Confirmation**: Destructive operations require confirmation or `-f/--force` flag
+- **Dependencies**: Scripts check for required tools and suggest installation commands
+- **Compatibility**: OS detection for Linux/macOS differences, POSIX-compliant where possible
