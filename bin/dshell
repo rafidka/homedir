@@ -1,0 +1,56 @@
+#!/bin/bash
+
+# Check if the container ID or name is provided
+if [ -z "$1" ]; then
+    echo "Usage: cssh <partial_container_id_or_name>"
+    echo "Running containers:"
+    docker ps --format "table {{.ID}}\t{{.Names}}"
+    exit 1
+fi
+
+PARTIAL_NAME=$1
+
+# Find container ID or name that matches the partial input
+MATCHING_CONTAINERS=$(docker ps --format '{{.ID}} {{.Names}}' | grep -E "$PARTIAL_NAME")
+
+# Check if no matching containers were found
+if [ -z "$MATCHING_CONTAINERS" ]; then
+    echo "Error: No running containers found matching '$PARTIAL_NAME'."
+    exit 1
+fi
+
+# Check if multiple containers match the partial name
+if [ $(echo "$MATCHING_CONTAINERS" | wc -l) -gt 1 ]; then
+    echo "Error: Multiple containers match '$PARTIAL_NAME':"
+    echo "$MATCHING_CONTAINERS"
+    echo "Please specify a more specific name or ID."
+    exit 1
+fi
+
+# Extract the exact container ID
+CONTAINER_ID=$(echo "$MATCHING_CONTAINERS" | awk '{print $1}')
+
+# Try to enter with /bin/bash if available, otherwise fallback to /bin/sh
+if docker container exec "$CONTAINER_ID" which bash &> /dev/null; then
+    docker container exec -it "$CONTAINER_ID" /bin/bash
+else
+    docker container exec -it "$CONTAINER_ID" /bin/sh
+fi
+
+### - #!/bin/bash
+### -
+### - # Check if the container ID is provided
+### - if [ -z "$1" ]; then
+### -     echo "Usage: cssh <container_id>"
+### -     exit 1
+### - fi
+### -
+### - CONTAINER_ID=$1
+### -
+### - # Check if the container is running
+### - if ! docker ps --format '{{.ID}}' | grep -q "^$CONTAINER_ID$"; then
+### -     echo "Error: Container $CONTAINER_ID is not running."
+### -     exit 1
+### - fi
+### -
+### - docker container exec -it "$CONTAINER_ID" /bin/sh

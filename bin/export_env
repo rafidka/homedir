@@ -1,0 +1,18 @@
+#!/bin/python3
+
+import os
+import sys
+
+def read_env_file(file_path):
+    with open(file_path, 'r') as file:
+        for line in file:
+            # Ignore comments and empty lines
+            if line.startswith('#') or not line.strip():
+                continue
+            key, value = line.strip().split('=', 1)
+            # Print export command
+            print(f'export {key}="{value}"')
+
+# Change '.env' to your environment file path
+read_env_file(sys.argv[1] if len(sys.argv) > 1 else '.env')
+

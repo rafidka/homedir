@@ -1,0 +1,60 @@
+#!/usr/bin/env python3
+"""
+mem_usage.py
+
+A simple tool to report the total memory usage (in MB) of a process, based on its executable path.
+
+Usage:
+    python mem_usage.py /full/path/to/process
+"""
+
+import subprocess
+import sys
+from typing import List
+
+
+def get_pids(process_path: str) -> List[int]:
+    """Get list of PIDs matching the given process path."""
+    try:
+        result = subprocess.run(
+            ["pgrep", "-f", process_path],
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        return [int(pid) for pid in result.stdout.strip().split()]
+    except subprocess.CalledProcessError:
+        return []
+
+
+def get_rss_kb(pid: int) -> int:
+    """Get the RSS memory of a given PID in KB."""
+    result = subprocess.run(
+        ["ps", "-o", "rss=", "-p", str(pid)],
+        capture_output=True,
+        text=True,
+        check=True
+    )
+    return int(result.stdout.strip())
+
+
+def main() -> None:
+    if len(sys.argv) != 2:
+        print(f"Usage: mem_usage /full/path/to/process")
+        sys.exit(1)
+
+    process_path = sys.argv[1]
+    pids = get_pids(process_path)
+
+    if not pids:
+        print(f"Process [{process_path}] not found.")
+        sys.exit(1)
+
+    total_mem_kb = sum(get_rss_kb(pid) for pid in pids)
+    total_mem_mb = total_mem_kb / 1024
+
+    print(f"Total memory usage of process [{process_path}]: {total_mem_mb:.2f} MB")
+
+
+if __name__ == "__main__":
+    main()

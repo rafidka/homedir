@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# Stop all running containers
+echo "Stopping all running containers..."
+docker stop $(docker ps -q)
+
+# Remove all containers
+echo "Removing all containers..."
+docker rm $(docker ps -a -q)
+
+echo "Removing all images..."
+docker rmi -f $(docker images -q)
+
+echo "All containers and images removed."

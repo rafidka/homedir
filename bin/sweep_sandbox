@@ -1,0 +1,61 @@
+#!/usr/bin/env python3
+import argparse
+import os
+import shutil
+import time
+from pathlib import Path
+
+# Constants
+SANDBOX_DIR = Path.home() / "Workspace" / "sandbox"
+AGE_THRESHOLD_DAYS = 0.5
+AGE_THRESHOLD_SECS = AGE_THRESHOLD_DAYS * 24 * 60 * 60
+NOW = time.time()
+
+
+def is_old_enough(path: Path) -> bool:
+    """Return True if the file/dir has not been accessed in over AGE_THRESHOLD_DAYS."""
+    try:
+        stat = path.stat()
+        return (NOW - stat.st_atime) > AGE_THRESHOLD_SECS
+    except FileNotFoundError:
+        return False  # Maybe deleted during scan
+
+
+def is_folder_unused(folder: Path) -> bool:
+    """Check if the folder and all its contents haven't been accessed recently."""
+    for root, dirs, files in os.walk(folder):
+        for name in dirs + files:
+            item_path = Path(root) / name
+            if not is_old_enough(item_path):
+                return False
+    return is_old_enough(folder)
+
+
+def delete_unused_items(dry_run: bool = False):
+    if not SANDBOX_DIR.exists():
+        print(f"Directory {SANDBOX_DIR} does not exist.")
+        return
+
+    for item in SANDBOX_DIR.iterdir():
+        try:
+            if item.is_dir():
+                if is_folder_unused(item):
+                    print(f"[DELETE DIR] {item}")
+                    if not dry_run:
+                        shutil.rmtree(item)
+            elif item.is_file():
+                if is_old_enough(item):
+                    print(f"[DELETE FILE] {item}")
+                    if not dry_run:
+                        item.unlink()
+        except Exception as e:
+            print(f"[ERROR] Failed to delete {item}: {e}")
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Sweep unused files and folders in the sandbox.")
+    parser.add_argument("--dry-run", action="store_true", help="Only show what would be deleted.")
+    args = parser.parse_args()
+
+    delete_unused_items(dry_run=args.dry_run)
+

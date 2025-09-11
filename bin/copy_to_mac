@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+set -ex
+
+MAC_USER="rafid"              # Mac username
+MAC_HOST="rafid-al-humaimidi" # Mac hostname (Tailscale)
+DEST_PATH="~/temp/"
+
+# === INPUT ===
+SRC_FILE="$1"
+
+if [[ -z "$SRC_FILE" ]]; then
+  echo "Usage: copy_to_mac <file-to-copy>"
+  exit 1
+fi
+
+scp "$SRC_FILE" "$MAC_USER@$MAC_HOST:$DEST_PATH"
+
+echo "✅ Copied to $MAC_HOST:$DEST_PATH"
+
