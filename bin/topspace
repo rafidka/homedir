@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# Usage: topspace.sh [N] [PATH]
+# Lists top N largest files/folders under PATH (default: current dir)
+
+N=${1:-10}
+DIR=${2:-.}
+
+du -xh "$DIR" 2>/dev/null \
+  | sort -hr \
+  | head -n "$N"

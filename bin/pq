@@ -1,0 +1,25 @@
+#!python3
+
+import json
+import ast
+import sys
+
+def format_to_json(data_str):
+    # Parse the string into a Python object
+    data = ast.literal_eval(data_str)
+    
+    # Convert the Python object to a JSON string
+    return json.dumps(data, indent=2)
+
+def main():
+    # Read input from stdin
+    data_str = sys.stdin.read().strip()
+    
+    # Format the input string into JSON
+    formatted_json = format_to_json(data_str)
+    
+    # Print the formatted JSON
+    print(formatted_json)
+
+if __name__ == '__main__':
+    main()
