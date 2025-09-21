@@ -33,8 +33,11 @@ config.send_composed_key_when_right_alt_is_pressed = IS_MAC
 local mac_keys = {
   { key = "h", mods = "CMD",  action = wezterm.action{ ActivateTabRelative = -1 } },
   { key = "n", mods = "CMD",  action = wezterm.action{ ActivateTabRelative =  1 } },
+  { key = "h", mods = "CMD|ALT",  action = wezterm.action{ MoveTabRelative = -1 } },
+  { key = "n", mods = "CMD|ALT",  action = wezterm.action{ MoveTabRelative =  1 } },
   { key = "t", mods = "CMD",  action = wezterm.action{ SpawnTab = "CurrentPaneDomain" } },
   { key = "w", mods = "CMD",  action = wezterm.action{ CloseCurrentTab = { confirm = true } } },
+  { key = "Enter", mods = "SHIFT", action = wezterm.action{ SendString="\x1b\r" }}, -- for Claude Code
   { key = "k", mods = "CMD",  action = wezterm.action.Multiple{
       wezterm.action.ClearScrollback "ScrollbackAndViewport",
     },
@@ -64,9 +67,51 @@ config.animation_fps = 120
 config.max_fps = 120
 
 -- Window padding
-config.window_padding = { left = 4, right = 4, top = 2, bottom = 2 }
+config.window_padding = {
+    left = 4,
+    right = 4,
+    top = 2,
+    bottom = 2
+}
 
 -- Scroll bar
 config.enable_scroll_bar = true
+config.window_padding.right = "2cell" -- scroll bar fills the right padding, so we increase it have a reasonably-sized scroll bar
+
+-- Increase scroll back history
+config.scrollback_lines = 100000
+
+local MAX_TITLE_LEN = 70  -- adjust max length here
+
+local function get_title(tab)
+  if tab.tab_title and #tab.tab_title > 0 then
+    return tab.tab_title
+  end
+  return tab.active_pane and tab.active_pane.title or ""
+end
+
+local function clamp(s, n)
+  s = s or ""
+  return (#s > n) and s:sub(1, n) or s
+end
+
+wezterm.on('format-tab-title', function(tab, tabs, panes, config, hover, max_width)
+  local short = clamp(get_title(tab), MAX_TITLE_LEN)
+
+  -- calculate spaces so total width ~= MAX_TITLE_LEN
+  local len_spaces = math.max(0, math.floor((MAX_TITLE_LEN - #short) / 2))
+  local spaces = string.rep(' ', len_spaces)
+  local text = spaces .. short .. spaces
+
+  if tab.is_active then
+    return {
+      { Background = { Color = '0040a0' } },
+      { Text = text },
+    }
+  end
+  return {
+      { Text = text }
+  }
+end)
 
 return config

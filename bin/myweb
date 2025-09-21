@@ -1,0 +1,249 @@
+#!/usr/bin/env python3
+"""
+Website blocker script for macOS hosts file management.
+Usage: myweb block <website> | myweb allow <website>
+"""
+
+import sys
+import subprocess
+from urllib.parse import urlparse
+
+
+class WebBlocker:
+    def __init__(self):
+        self.hosts_file = "/etc/hosts"
+        self.start_marker = "# Blocklist Start"
+        self.end_marker = "# Blocklist End"
+        self.ipv4_null = "0.0.0.0"
+        self.ipv6_null = "::"
+
+    def normalize_domain(self, website: str):
+        """Extract domain from URL and normalize it."""
+        if not website.startswith(("http://", "https://")):
+            website = "https://" + website
+
+        parsed = urlparse(website)
+        domain = parsed.netloc or parsed.path
+
+        # Remove port numbers
+        domain = domain.split(":")[0]
+
+        # Remove www prefix for base domain
+        base_domain = (
+            domain.replace("www.", "") if domain.startswith("www.") else domain
+        )
+
+        return base_domain
+
+    def generate_variants(self, domain: str):
+        """Generate common domain variants to block."""
+        variants: set[str] = set()
+
+        # Add base domain
+        variants.add(domain)
+
+        # Add www variant
+        if not domain.startswith("www."):
+            variants.add(f"www.{domain}")
+
+        # Add common subdomains for popular sites
+        common_subdomains = ["m", "mobile", "app", "api", "cdn", "static"]
+        for sub in common_subdomains:
+            variants.add(f"{sub}.{domain}")
+
+        # Add specific variants for major platforms
+        if "youtube.com" in domain:
+            variants.update(
+                ["youtu.be", "m.youtube.com", "music.youtube.com", "tv.youtube.com"]
+            )
+        elif "facebook.com" in domain:
+            variants.update(["fb.com", "m.facebook.com", "www.fb.com"])
+        elif "twitter.com" in domain:
+            variants.update(["x.com", "www.x.com", "t.co", "mobile.twitter.com"])
+        elif "reddit.com" in domain:
+            variants.update(["old.reddit.com", "new.reddit.com", "i.reddit.com"])
+        elif "instagram.com" in domain:
+            variants.update(["www.instagram.com", "help.instagram.com"])
+
+        return sorted(variants)
+
+    def read_hosts_file(self):
+        """Read the current hosts file content."""
+        try:
+            with open(self.hosts_file, "r") as f:
+                return f.readlines()
+        except PermissionError:
+            print("Error: Permission denied. Please run with sudo.")
+            sys.exit(1)
+        except FileNotFoundError:
+            print("Error: /etc/hosts file not found.")
+            sys.exit(1)
+
+    def write_hosts_file(self, lines: list[str]):
+        """Write content back to hosts file."""
+        try:
+            with open(self.hosts_file, "w") as f:
+                f.writelines(lines)
+            self.flush_dns_cache()
+        except PermissionError:
+            print("Error: Permission denied. Please run with sudo.")
+            sys.exit(1)
+
+    def flush_dns_cache(self):
+        """Flush DNS cache on macOS."""
+        try:
+            subprocess.run(
+                ["sudo", "dscacheutil", "-flushcache"], check=True, capture_output=True
+            )
+            subprocess.run(
+                ["sudo", "killall", "-HUP", "mDNSResponder"],
+                check=True,
+                capture_output=True,
+            )
+            print("DNS cache flushed.")
+        except subprocess.CalledProcessError:
+            print(
+                "Warning: Could not flush DNS cache. You may need to restart your browser."
+            )
+
+    def find_blocklist_section(self, lines: list[str]):
+        """Find the start and end of the blocklist section."""
+        start_idx = None
+        end_idx = None
+
+        for i, line in enumerate(lines):
+            if self.start_marker in line:
+                start_idx = i
+            elif self.end_marker in line:
+                end_idx = i
+                break
+
+        return start_idx, end_idx
+
+    def create_blocklist_section(self, lines: list[str]):
+        """Create a new blocklist section if it doesn't exist."""
+        lines.append(f"\n{self.start_marker}\n")
+        lines.append(f"{self.end_marker}\n")
+        return len(lines) - 2, len(lines) - 1
+
+    def block_website(self, website: str):
+        """Add website and its variants to the blocklist."""
+        domain = self.normalize_domain(website)
+        variants = self.generate_variants(domain)
+
+        lines = self.read_hosts_file()
+        start_idx, end_idx = self.find_blocklist_section(lines)
+
+        if start_idx is None or end_idx is None:
+            start_idx, end_idx = self.create_blocklist_section(lines)
+
+        # Get existing blocked domains to avoid duplicates
+        existing_domains: set[str] = set()
+        for i in range(start_idx + 1, end_idx):
+            line = lines[i].strip()
+            if line and not line.startswith("#"):
+                parts = line.split()
+                if len(parts) >= 2:
+                    existing_domains.add(parts[1])
+
+        # Add new entries
+        new_entries: list[str] = []
+        for variant in variants:
+            if variant not in existing_domains:
+                new_entries.append(f"{self.ipv4_null} {variant}\n")
+                new_entries.append(f"{self.ipv6_null} {variant}\n")
+
+        if new_entries:
+            # Insert new entries before the end marker
+            lines[end_idx:end_idx] = new_entries
+            self.write_hosts_file(lines)
+            print(f"Blocked {domain} and {len(variants)} variants:")
+            for variant in variants:
+                print(f"  - {variant}")
+        else:
+            print(f"{domain} is already blocked.")
+
+    def allow_website(self, website: str):
+        """Remove website and its variants from the blocklist."""
+        domain = self.normalize_domain(website)
+        variants = self.generate_variants(domain)
+
+        lines = self.read_hosts_file()
+        start_idx, end_idx = self.find_blocklist_section(lines)
+
+        if start_idx is None or end_idx is None:
+            print(f"{domain} is not currently blocked.")
+            return
+
+        # Remove lines containing any of the variants
+        removed_domains: set[str] = set()
+        i = start_idx + 1
+        while i < end_idx:
+            line = lines[i].strip()
+            if line and not line.startswith("#"):
+                parts = line.split()
+                if len(parts) >= 2 and parts[1] in variants:
+                    removed_domains.add(parts[1])
+                    lines.pop(i)
+                    end_idx -= 1
+                    continue
+            i += 1
+
+        if removed_domains:
+            self.write_hosts_file(lines)
+            print(f"Unblocked {domain} and variants:")
+            for variant in sorted(removed_domains):
+                print(f"  - {variant}")
+        else:
+            print(f"{domain} was not found in the blocklist.")
+
+    def show_help(self):
+        """Display help information."""
+        help_text = """
+Website Blocker (myweb) - Block/unblock websites via hosts file
+
+Usage:
+  myweb block <website>    Block a website and its common variants
+  myweb allow <website>    Unblock a website and its variants
+  myweb help              Show this help message
+
+Examples:
+  myweb block facebook.com     # Blocks facebook.com, www.facebook.com, m.facebook.com, etc.
+  myweb block youtube.com      # Blocks youtube.com, youtu.be, music.youtube.com, etc.
+  myweb allow reddit.com       # Unblocks all reddit.com variants
+
+Note: This script requires sudo privileges to modify /etc/hosts
+        """
+        print(help_text)
+
+
+def main():
+    if len(sys.argv) < 2:
+        WebBlocker().show_help()
+        sys.exit(1)
+
+    blocker = WebBlocker()
+    command = sys.argv[1].lower()
+
+    if command == "help":
+        blocker.show_help()
+    elif command == "block":
+        if len(sys.argv) != 3:
+            print("Usage: myweb block <website>")
+            sys.exit(1)
+        website = sys.argv[2]
+        blocker.block_website(website)
+    elif command == "allow":
+        if len(sys.argv) != 3:
+            print("Usage: myweb allow <website>")
+            sys.exit(1)
+        website = sys.argv[2]
+        blocker.allow_website(website)
+    else:
+        print(f"Unknown command: {command}")
+        blocker.show_help()
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()
