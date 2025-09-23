@@ -32,3 +32,5 @@ if [[ "`uname`" == "Linux" ]]; then
     alias xcopy="xclip -selection c"
     alias xpaste="xclip -selection c -o"
 fi
+
+alias gco='git checkout $(git branch --format="%(refname:short)" | fzf)'
