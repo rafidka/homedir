@@ -1,0 +1,84 @@
+#!/usr/bin/env bash
+
+# fzkill: fuzzy-find processes and kill them
+# deps: fzf, ps, awk, xargs, kill
+# put me somewhere on PATH and chmod +x
+
+set -euo pipefail
+
+# ensure cleanup on exit or interruption
+cleanup() {
+    tput rmcup
+}
+trap cleanup EXIT INT TERM
+
+# show an alternate screen
+tput smcup
+clear
+
+# Detect ps format cross-platform
+if [[ "$(uname)" == "Darwin" ]]; then
+  # macOS
+  PS_CMD='ps -axo pid=,ppid=,user=,stat=,%cpu=,%mem=,lstart=,command='
+else
+  # Linux
+  PS_CMD='ps -eo pid=,ppid=,user=,stat=,%cpu=,%mem=,lstart=,command='
+fi
+
+# Don’t show this script or the current shell process
+SELF_PID=$$
+SHELL_PID=$PPID
+
+# Build the list; keep PID as the first column so {+1} works
+LIST_CMD="$PS_CMD | awk '\$1 != $SELF_PID && \$1 != $SHELL_PID {print}'"
+
+# FZF: search, multi-select; choose signal with keys
+#   Enter  -> TERM (default)
+#   Ctrl-K -> KILL
+#   Ctrl-C -> INT
+#   Ctrl-H -> HUP
+# Preview shows the full command line
+while true; do
+    SELECTION="$(
+      bash -c "$LIST_CMD" | \
+      fzf --multi --height=90% --layout=reverse --border \
+          --prompt='kill> ' \
+          --header=$'Enter: TERM   Ctrl-K: KILL   Ctrl-I: INT   Ctrl-H: HUP' \
+          --preview 'echo {}' \
+          --preview-window='down,3,wrap' \
+          --with-nth=1.. \
+          --expect=enter,ctrl-k,ctrl-i,ctrl-h
+    )"
+
+    # If nothing selected, exit quietly
+    [[ -z "$SELECTION" ]] && exit 0
+
+    KEY=$(printf '%s\n' "$SELECTION" | head -n1)
+    LINES=$(printf '%s\n' "$SELECTION" | tail -n +2)
+    # Extract PIDs (first whitespace-delimited field)
+    PIDS=$(printf '%s\n' "$LINES" | awk '{print $1}' | tr '\n' ' ')
+
+    # Map key -> signal
+    case "$KEY" in
+      enter) SIG=TERM ;;
+      ctrl-k) SIG=KILL ;;
+      ctrl-i) SIG=INT ;;
+      ctrl-h) SIG=HUP ;;
+      *) exit 0 ;;
+    esac
+
+    # Confirm
+    echo "Signal: $SIG"
+    echo "PIDs:   $PIDS"
+    read -r -p "Proceed? [y/N] " ans
+    [[ "${ans:-}" =~ ^[Yy]$ ]] || {
+        clear
+        continue
+    }
+
+    # Send signal (batched, robust to many PIDs)
+    # -r: no run if empty (GNU xargs); on macOS it's fine since we guard above
+    printf '%s\n' $PIDS | xargs -n100 kill -s "$SIG"
+
+    echo "Done."
+done
