@@ -43,11 +43,11 @@ while true; do
       bash -c "$LIST_CMD" | \
       fzf --multi --height=90% --layout=reverse --border \
           --prompt='kill> ' \
-          --header=$'Enter: TERM   Ctrl-K: KILL   Ctrl-I: INT   Ctrl-H: HUP' \
+          --header=$'Enter: TERM   Ctrl-K: KILL   Ctrl-I: INT   Ctrl-H: HUP   Ctrl-R: Refresh' \
           --preview 'echo {}' \
           --preview-window='down,3,wrap' \
           --with-nth=1.. \
-          --expect=enter,ctrl-k,ctrl-i,ctrl-h
+          --expect=enter,ctrl-k,ctrl-i,ctrl-h,ctrl-r
     )"
 
     # If nothing selected, exit quietly
@@ -64,6 +64,7 @@ while true; do
       ctrl-k) SIG=KILL ;;
       ctrl-i) SIG=INT ;;
       ctrl-h) SIG=HUP ;;
+      ctrl-r) continue ;;
       *) exit 0 ;;
     esac
 
@@ -80,5 +81,5 @@ while true; do
     # -r: no run if empty (GNU xargs); on macOS it's fine since we guard above
     printf '%s\n' $PIDS | xargs -n100 kill -s "$SIG"
 
-    echo "Done."
+    clear
 done
