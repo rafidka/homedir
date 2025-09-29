@@ -42,6 +42,10 @@ local mac_keys = {
       wezterm.action.ClearScrollback "ScrollbackAndViewport",
     },
   },
+  { key = "PageUp", mods = "NONE", action = wezterm.action.ScrollByPage(-1), },
+  { key = "PageDown", mods = "NONE", action = wezterm.action.ScrollByPage(1), },
+  { key = "Home", mods = "CTRL", action = wezterm.action.ScrollToTop, },
+  { key = "End", mods = "CTRL", action = wezterm.action.ScrollToBottom, },
 }
 
 -- Linux-specific per your request:
@@ -57,6 +61,10 @@ local linux_keys = {
       wezterm.action.ClearScrollback "ScrollbackAndViewport",
     },
   },
+  { key = "PageUp", mods = "NONE", action = wezterm.action.ScrollByPage(-1), },
+  { key = "PageDown", mods = "NONE", action = wezterm.action.ScrollByPage(1), },
+  { key = "Home", mods = "CTRL", action = wezterm.action.ScrollToTop, },
+  { key = "End", mods = "CTRL", action = wezterm.action.ScrollToBottom, },
 }
 
 config.keys = IS_MAC and mac_keys or linux_keys
