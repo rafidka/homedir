@@ -1,25 +1,43 @@
 {
     "chat.agent.enabled": true,
+    "chat.mcp.gallery.enabled": true,
     // Editor settings.
     "editor.autoClosingBrackets": "never",
     "editor.autoClosingComments": "never",
     "editor.autoClosingDelete": "never",
     "editor.autoClosingOvertype": "never",
     "editor.autoClosingQuotes": "never",
-    "editor.fontFamily": "'Cascadia Code', 'Droid Sans Mono', 'monospace', monospace, 'Droid Sans Fallback'",
+    "editor.fontFamily": "'Jet Brains Mono NL', 'Cascadia Code', 'Droid Sans Mono', 'monospace', monospace, 'Droid Sans Fallback'",
     "editor.fontLigatures": true,
     "editor.formatOnSave": false,
     "editor.formatOnType": true,
     "editor.inlayHints.enabled": "off",
     "editor.inlineSuggest.enabled": true,
     "editor.lineNumbers": "relative",
+    "editor.mouseWheelZoom": true,
     "editor.suggestSelection": "first",
     "editor.tabCompletion": "on",
     // Explorer settings
     "explorer.confirmDragAndDrop": false,
     "explorer.excludeGitIgnore": false,
+    // File settings
+    "files.watcherExclude": {
+        "**/.venv": true,
+        "**/.git": true,
+        "**/build": true,
+        "**/node_modules": true,
+    },
+    "files.exclude": {
+        "**/.venv": true,
+        "**/.git": true,
+        "**/build": true,
+        "**/node_modules": true,
+    },
     // Git settings
     "git.enableCommitSigning": true,
+    "git.openRepositoryInParentFolders": "never",
+    // GitHub Copilot settings
+    "github.copilot.nextEditSuggestions.enabled": true,
     // Python/Jupyter settings
     "jupyter.askForKernelRestart": false,
     "notebook.cellToolbarLocation": {
@@ -31,9 +49,31 @@
     "python.languageServer": "Pylance",
     "python.analysis.typeCheckingMode": "standard",
     "telemetry.telemetryLevel": "off",
+    // Remote SSH settings
+    "remote.SSH.connectTimeout": 1800,
+    // Ruff settings
+    "ruff.path": [
+        "/home/rafid_cohere_com/.local/bin/ruff"
+    ],
+    // Search settings
+    "search.exclude": {
+        "**/.venv": true,
+        "**/.git": true,
+        "**/build": true,
+        "**/node_modules": true,
+    },
+    "search.useIgnoreFiles": false,
+    // Security settings
+    "security.workspace.trust.untrustedFiles": "open",
     // Terminal settings
+    "terminal.integrated.copyOnSelection": true,
+    "terminal.integrated.defaultProfile.linux": "zsh",
     "terminal.integrated.env.windows": {},
     "terminal.integrated.inheritEnv": false,
+    // Testing settings
+    "testing.automaticallyOpenPeekView": "never",
+    "testing.automaticallyOpenPeekViewDuringAutoRun": false,
+    "testing.automaticallyOpenTestResults": "neverOpen",
     // Vim settings
     "vim.easymotion": true,
     "vim.handleKeys": {
@@ -50,13 +90,27 @@
     "vim.textwidth": 88,
     // Window settings
     "window.titleBarStyle": "custom",
+    // Workbench settings
     "workbench.editor.enablePreview": false,
     "workbench.editor.enablePreviewFromQuickOpen": false,
     "workbench.editorAssociations": {
         "*.ipynb": "jupyter-notebook"
     },
     "workbench.iconTheme": "vscode-icons",
+    "workbench.startupEditor": "none",
+    "workbench.colorTheme": "Solarized Dark",
     // Language-specific settings.
+    "[dockerfile]": {
+        "editor.rulers": [
+            100
+        ],
+        "editor.wordWrapColumn": 100,
+        "prettier.printWidth": 100,
+        "vim.textwidth": 100
+    },
+    "[html]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
     "[javascript]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode",
         "editor.rulers": [
@@ -77,6 +131,14 @@
         ],
         "editor.wordWrapColumn": 88
     },
+    "[shellscript]": {
+        "editor.rulers": [
+            100
+        ],
+        "editor.wordWrapColumn": 100,
+        "prettier.printWidth": 100,
+        "vim.textwidth": 100
+    },
     "[typescript]": {
         "editor.rulers": [
             120
@@ -86,47 +148,11 @@
         "prettier.printWidth": 120,
         "vim.textwidth": 120
     },
-    "[shellscript]": {
-        "editor.rulers": [
-            100
-        ],
-        "editor.wordWrapColumn": 100,
-        "prettier.printWidth": 100,
-        "vim.textwidth": 100
+    "[typescriptreact]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
-    "[dockerfile]": {
-        "editor.rulers": [
-            100
-        ],
-        "editor.wordWrapColumn": 100,
-        "prettier.printWidth": 100,
-        "vim.textwidth": 100
-    },
-    "workbench.startupEditor": "none",
-    "git.openRepositoryInParentFolders": "never",
-    "files.watcherExclude": {
-        "**/.venv": true,
-        "**/.git": true,
-        "**/build": true,
-        "**/node_modules": true,
-    },
-    "files.exclude": {
-        "**/.venv": true,
-        "**/.git": true,
-        "**/build": true,
-        "**/node_modules": true,
-    },
-    "search.exclude": {
-        "**/.venv": true,
-        "**/.git": true,
-        "**/build": true,
-        "**/node_modules": true,
-    },
-    "search.useIgnoreFiles": false,
-    "ruff.path": [
-        "/home/rafid_cohere_com/.local/bin/ruff"
-    ],
     "cSpell.userWords": [
+        "Rafid",
         "aioboto",
         "aiohttp",
         "asgi",
@@ -224,7 +250,6 @@
         "qline",
         "qrels",
         "quicktext",
-        "Rafid",
         "rerank",
         "reranker",
         "reranking",
@@ -258,17 +283,4 @@
         "wordprocessingml",
         "yolox"
     ],
-    "extensions.ignoreRecommendations": true,
-    "terminal.integrated.copyOnSelection": true,
-    "[html]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode"
-    },
-    "workbench.colorTheme": "Default Dark+",
-    "security.workspace.trust.untrustedFiles": "open",
-    "testing.automaticallyOpenPeekView": "never",
-    "testing.automaticallyOpenPeekViewDuringAutoRun": false,
-    "[typescriptreact]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode"
-    },
-    "editor.mouseWheelZoom": true
 }
